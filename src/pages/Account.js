@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Button, Card, Flex, Space, Table, Typography } from "antd";
+import { Button, Card, Flex, Space, Table, Tooltip, Typography } from "antd";
 import { getAccounts } from "../services/token";
 import LinearTitle from "../components/LinearTitle";
 import { useAccount } from "wagmi";
@@ -85,7 +85,11 @@ export default function Account() {
               {
                 dataIndex: 'user',
                 title: 'User',
-                render: (text) => shortAddress(text)
+                render: (text) => (
+                  <Tooltip title={text}>
+                    {shortAddress(text)}
+                  </Tooltip>
+                )
               },
               {
                 dataIndex: 'tick',

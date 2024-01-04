@@ -5,8 +5,8 @@ import { Button, Card, Descriptions, Flex, message, Progress, Space, Tabs } from
 import LinearTitle from "../components/LinearTitle";
 import { getToken } from "../services/token";
 import moment from "moment/moment";
-import Transfers from "../views/tokens/Transfers";
-import Holders from "../views/tokens/Holders";
+import Transfers from "../views/token/Transfers";
+import Holders from "../views/token/Holders";
 
 export default function Token() {
   const {tick} = useParams()

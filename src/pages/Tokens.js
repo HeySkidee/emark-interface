@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Button, Card, Flex, Progress, Segmented, Space, Table, Typography } from "antd";
+import { Button, Card, Flex, Progress, Segmented, Space, Table, Tooltip, Typography } from "antd";
 import moment from "moment";
 import { getTokens } from "../services/token";
 import { shortAddress } from "../utils/address";
@@ -139,7 +139,11 @@ export default function Tokens() {
               {
                 dataIndex: 'deployer',
                 title: 'Deployer',
-                render: (text) => shortAddress(text)
+                render: (text) => (
+                  <Tooltip title={text}>
+                    {shortAddress(text)}
+                  </Tooltip>
+                )
               },
               {
                 title: 'Action',
