@@ -23,7 +23,7 @@ const Content = styled.div`
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
-  max-width: 1400px;
+  max-width: calc(100% - 100px);
 
   @media (max-width: 800px) {
     padding: 0 15px;
