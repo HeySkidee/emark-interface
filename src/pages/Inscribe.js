@@ -1,17 +1,31 @@
 import styled from "styled-components";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Card, Flex, Segmented, Typography } from "antd";
 import LinearTitle from "../components/LinearTitle";
 import Mint from "../views/inscribe/Mint";
 import Deploy from "../views/inscribe/Deploy";
 import Transfer from "../views/inscribe/Transfer";
 import useParsedQueryString from "../hooks/useParsedQueryString";
+import moment from "moment";
 
 export default function Inscribe() {
   const [current, setCurrent] = useState('mint')
 
   const [form, setForm] = useState(null)
   const query = useParsedQueryString()
+  const [now, setNow] = useState(Date.now())
+  const startAt = moment('2024-01-05 20:00:00+8')
+
+  useEffect(() => {
+    const inc = setInterval(() => {
+      setNow(Date.now())
+    }, 1000)
+    return () => clearInterval(inc)
+  }, []);
+
+  const isStart = useMemo(() => {
+    return moment(now).isAfter(startAt)
+  }, [now, startAt])
 
   useEffect(() => {
     if (query && query.op) {
@@ -38,7 +52,6 @@ export default function Inscribe() {
           break
         default:
       }
-
     }
   }, [query]);
 
@@ -67,13 +80,13 @@ export default function Inscribe() {
 
         <FormWrapper>
           {
-            current === 'mint' && <Mint current={form}/>
+            current === 'mint' && <Mint isStart={isStart} startAt={startAt} current={form}/>
           }
           {
-            current === 'deploy' && <Deploy current={form}/>
+            current === 'deploy' && <Deploy isStart={isStart} startAt={startAt} current={form}/>
           }
           {
-            current === 'transfer' && <Transfer current={form}/>
+            current === 'transfer' && <Transfer isStart={isStart} startAt={startAt} current={form}/>
           }
         </FormWrapper>
       </Card>

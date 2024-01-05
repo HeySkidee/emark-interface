@@ -6,7 +6,7 @@ import { FACTORY } from "../../constants";
 import { waitForTransaction } from "@wagmi/core";
 import { getToken } from "../../services/token";
 
-const Mint = ({current}) => {
+const Mint = ({current, isStart}) => {
   const [loading, setLoading] = useState(false)
   const [form] = Form.useForm()
 
@@ -114,7 +114,7 @@ const Mint = ({current}) => {
       <Divider/>
 
       <Form.Item wrapperCol={{xs: {offset: 0}, md: {offset: 6, span: 12}}}>
-        <Button disabled={!address} block loading={loading} type="primary" htmlType="submit">
+        <Button disabled={!address || !isStart} block loading={loading} type="primary" htmlType="submit">
           Mint
         </Button>
       </Form.Item>

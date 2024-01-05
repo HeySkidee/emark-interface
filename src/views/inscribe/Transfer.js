@@ -4,7 +4,7 @@ import { useAccount, useSendTransaction } from "wagmi";
 import { stringToHex } from "viem";
 import { waitForTransaction } from "@wagmi/core";
 
-const Transfer = ({current}) => {
+const Transfer = ({current, isStart}) => {
   const [loading, setLoading] = useState(false)
   const [form] = Form.useForm()
 
@@ -84,7 +84,7 @@ const Transfer = ({current}) => {
       <Divider/>
 
       <Form.Item wrapperCol={{xs: {offset: 0}, md: {offset: 6, span: 12}}}>
-        <Button disabled={!address} block loading={loading} type="primary" htmlType="submit">
+        <Button disabled={!address || !isStart} block loading={loading} type="primary" htmlType="submit">
           Transfer
         </Button>
       </Form.Item>
