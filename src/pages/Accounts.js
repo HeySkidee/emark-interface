@@ -1,74 +1,51 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import styled from "styled-components";
-import { Button, Card, Flex, Space, Table, Tooltip, Typography } from "antd";
+import { Button, Card, Flex, message, Space, Tooltip, Typography } from "antd";
 import { getAccounts } from "../services/token";
 import LinearTitle from "../components/LinearTitle";
 import { useAccount } from "wagmi";
 import { shortAddress } from "../utils/address";
+import { ProTable } from "@ant-design/pro-components";
 
-export default function Account() {
-  const [data, setData] = useState([])
-  const [loading, setLoading] = useState(false)
-
+export default function Accounts() {
   const {address} = useAccount()
+  const actionRef = useRef()
 
-  const [tableParams, setTableParams] = useState({
-    pagination: {
-      current: 1,
-      pageSize: 10,
-    },
-  });
+  useEffect(() => {
+    if (actionRef.current) {
+      actionRef.current.reload()
+    }
+  }, [address]);
 
-  const fetch = async () => {
-    setLoading(true)
+  const fetch = useCallback(async (params, sort, filter) => {
     try {
       const msg = await getAccounts({
-        page: tableParams.pagination.current,
-        limit: tableParams.pagination.pageSize,
-        user: address,
-        sort: JSON.stringify({[tableParams.field]: tableParams.order}),
-        ...tableParams.filters,
+        page: params.current,
+        limit: params.pageSize,
+        sort: JSON.stringify(sort),
+        user: address
       })
       if (msg.data.code === 0) {
-        setData(msg.data.data.list);
-
-        setTableParams({
-          ...tableParams,
-          pagination: {
-            ...tableParams.pagination,
-            total: msg.data.data.total,
-          },
-        });
+        return {
+          data: msg.data.data.list,
+          total: msg.data.data.total,
+          success: true,
+        };
+      } else {
+        message.error(msg.data.message)
+        return {
+          success: false,
+        };
       }
     } catch (e) {
       console.log(e)
-    } finally {
-      setLoading(false)
     }
-  }
-
-  useEffect(() => {
-    fetch();
-    // eslint-disable-next-line
-  }, [JSON.stringify(tableParams)]);
-
-  const handleTableChange = (pagination, filters, sorter) => {
-    setTableParams({
-      pagination,
-      filters,
-      ...sorter,
-    });
-
-    // `dataSource` is useless since `pageSize` changed
-    if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-      setData([]);
-    }
-  };
+  }, [address])
 
   return (
     <Wrapper>
       <Flex justify={"center"}>
-        <LinearTitle>Account</LinearTitle>
+        <LinearTitle>Accounts</LinearTitle>
       </Flex>
 
       <Card bordered={false}>
@@ -79,8 +56,7 @@ export default function Account() {
         </Flex>
 
         <TableWrapper>
-          <Table
-            style={{marginTop: '20px'}}
+          <ProTable
             columns={[
               {
                 dataIndex: 'user',
@@ -110,11 +86,11 @@ export default function Account() {
                 )
               },
             ]}
+            actionRef={actionRef}
             rowKey={(record) => record.user + record.tick}
-            dataSource={data}
-            pagination={tableParams.pagination}
-            loading={loading}
-            onChange={handleTableChange}
+            request={fetch}
+            search={false}
+            toolBarRender={false}
           />
         </TableWrapper>
       </Card>
@@ -131,4 +107,5 @@ const TableWrapper = styled.div`
   white-space: nowrap;
   overflow-x: scroll;
   overflow-y: hidden;
+  margin-top: 20px;
 `

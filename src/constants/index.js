@@ -1,5 +1,5 @@
 // API
-export const BASE_URI = '/';
+export const BASE_URI = 'https://emark20.com/';
 
 /**
  * FACTORY Contract

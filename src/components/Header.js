@@ -22,14 +22,14 @@ export default function Header() {
   const [current, setCurrent] = useState('')
   const items = [
     {
-      label: 'Account',
-      key: 'account',
-      icon: <FiDatabase/>
-    },
-    {
       label: 'Inscribe',
       key: 'inscribe',
       icon: <FiEdit/>
+    },
+    {
+      label: 'Accounts',
+      key: 'accounts',
+      icon: <FiDatabase/>
     },
     {
       label: 'Tokens',

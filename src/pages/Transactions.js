@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useRef } from "react";
 import styled from "styled-components";
-import { Card, Flex, Table, Tooltip, Typography } from "antd";
+import { Card, Flex, message, Tooltip, Typography } from "antd";
 import moment from "moment";
 import { getTxs } from "../services/token";
 import { shortAddress } from "../utils/address";
@@ -8,61 +8,35 @@ import LinearTitle from "../components/LinearTitle";
 
 import scan from '../assets/images/scan.png'
 import InscriptionRaw from "../components/InscriptionRaw";
+import { ProTable } from "@ant-design/pro-components";
 
 export default function Transactions() {
-  const [data, setData] = useState([])
-  const [loading, setLoading] = useState(false)
+  const actionRef = useRef()
 
-  const [tableParams, setTableParams] = useState({
-    pagination: {
-      current: 1,
-      pageSize: 10,
-    },
-  });
-
-  const fetch = async () => {
-    setLoading(true)
+  const fetch = useCallback(async (params, sort, filter) => {
     try {
       const msg = await getTxs({
-        page: tableParams.pagination.current,
-        limit: tableParams.pagination.pageSize,
-        sort: JSON.stringify({[tableParams.field]: tableParams.order}),
+        page: params.current,
+        limit: params.pageSize,
+        sort: JSON.stringify(sort),
+        ...filter
       })
       if (msg.data.code === 0) {
-        setData(msg.data.data.list);
-
-        setTableParams({
-          ...tableParams,
-          pagination: {
-            ...tableParams.pagination,
-            total: msg.data.data.total,
-          },
-        });
+        return {
+          data: msg.data.data.list,
+          total: msg.data.data.total,
+          success: true,
+        };
+      } else {
+        message.error(msg.data.message)
+        return {
+          success: false,
+        };
       }
     } catch (e) {
       console.log(e)
-    } finally {
-      setLoading(false)
     }
-  }
-
-  useEffect(() => {
-    fetch();
-    // eslint-disable-next-line
-  }, [JSON.stringify(tableParams)]);
-
-  const handleTableChange = (pagination, filters, sorter) => {
-    setTableParams({
-      pagination,
-      filters,
-      ...sorter,
-    });
-
-    // `dataSource` is useless since `pageSize` changed
-    if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-      setData([]);
-    }
-  };
+  }, [])
 
   return (
     <Wrapper>
@@ -78,9 +52,7 @@ export default function Transactions() {
         </Flex>
 
         <TableWrapper>
-
-          <Table
-            style={{marginTop: '20px'}}
+          <ProTable
             columns={[
               {
                 dataIndex: 'id',
@@ -137,11 +109,11 @@ export default function Transactions() {
                 )
               },
             ]}
+            actionRef={actionRef}
             rowKey={'id'}
-            dataSource={data}
-            pagination={tableParams.pagination}
-            loading={loading}
-            onChange={handleTableChange}
+            request={fetch}
+            search={false}
+            toolBarRender={false}
           />
         </TableWrapper>
       </Card>
@@ -158,4 +130,5 @@ const TableWrapper = styled.div`
   white-space: nowrap;
   overflow-x: scroll;
   overflow-y: hidden;
+  margin-top: 20px;
 `

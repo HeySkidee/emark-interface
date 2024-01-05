@@ -1,70 +1,48 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { Button, Card, Flex, Progress, Segmented, Space, Table, Tooltip, Typography } from "antd";
+import { Button, Card, Flex, message, Progress, Segmented, Space, Tooltip, Typography } from "antd";
 import moment from "moment";
 import { getTokens } from "../services/token";
 import { shortAddress } from "../utils/address";
 import LinearTitle from "../components/LinearTitle";
 import scan from "../assets/images/scan.png";
 import { Link } from "react-router-dom";
+import { ProTable } from "@ant-design/pro-components";
 
 export default function Tokens() {
-  const [data, setData] = useState([])
-  const [loading, setLoading] = useState(false)
+  const actionRef = useRef()
   const [state, setState] = useState(0)
 
-  const [tableParams, setTableParams] = useState({
-    pagination: {
-      current: 1,
-      pageSize: 10,
-    },
-  });
+  useEffect(() => {
+    if (actionRef.current){
+      actionRef.current.reload()
+    }
+  }, [state]);
 
-  const fetch = async () => {
-    setLoading(true)
+  const fetch = useCallback(async (params, sort, filter) => {
     try {
       const msg = await getTokens({
-        page: tableParams.pagination.current,
-        limit: tableParams.pagination.pageSize,
+        page: params.current,
+        limit: params.pageSize,
         state,
-        sort: JSON.stringify({[tableParams.field]: tableParams.order}),
-        ...tableParams.filters,
+        sort: JSON.stringify(sort),
       })
       if (msg.data.code === 0) {
-        setData(msg.data.data.list);
-
-        setTableParams({
-          ...tableParams,
-          pagination: {
-            ...tableParams.pagination,
-            total: msg.data.data.total,
-          },
-        });
+        return {
+          data: msg.data.data.list,
+          total: msg.data.data.total,
+          success: true,
+        };
+      } else {
+        message.error(msg.data.message)
+        return {
+          success: false,
+        };
       }
     } catch (e) {
       console.log(e)
-    } finally {
-      setLoading(false)
     }
-  }
-
-  useEffect(() => {
-    fetch();
-    // eslint-disable-next-line
-  }, [JSON.stringify(tableParams), state]);
-
-  const handleTableChange = (pagination, filters, sorter) => {
-    setTableParams({
-      pagination,
-      filters,
-      ...sorter,
-    });
-
-    // `dataSource` is useless since `pageSize` changed
-    if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-      setData([]);
-    }
-  };
+  }, [state])
 
   return (
     <Wrapper>
@@ -91,9 +69,7 @@ export default function Tokens() {
         </Flex>
 
         <TableWrapper>
-
-          <Table
-            style={{marginTop: '20px'}}
+          <ProTable
             columns={[
               {
                 dataIndex: 'txId',
@@ -155,11 +131,11 @@ export default function Tokens() {
                 )
               },
             ]}
+            actionRef={actionRef}
             rowKey={'tick'}
-            dataSource={data}
-            pagination={tableParams.pagination}
-            loading={loading}
-            onChange={handleTableChange}
+            request={fetch}
+            search={false}
+            toolBarRender={false}
           />
         </TableWrapper>
       </Card>
@@ -176,4 +152,5 @@ const TableWrapper = styled.div`
   white-space: nowrap;
   overflow-x: scroll;
   overflow-y: hidden;
+  margin-top: 20px;
 `
