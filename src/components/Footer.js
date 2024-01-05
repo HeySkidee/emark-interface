@@ -1,10 +1,15 @@
 import React from "react";
 import styled from "styled-components"
 import { FaGithub, FaTwitter } from "react-icons/fa";
+import { shortAddress } from "../utils/address";
+import { FACTORY } from "../constants";
 
 export default function Footer() {
   return (
     <Wrapper>
+      <FactoryWrapper>
+        Factory: {shortAddress(FACTORY)}
+      </FactoryWrapper>
       <CopyrightText>© 2024 The E-MARK</CopyrightText>
 
       <MediaLinkWrapper>
@@ -14,6 +19,11 @@ export default function Footer() {
     </Wrapper>
   )
 }
+
+const FactoryWrapper = styled.div`
+  font-size: 10px;
+  color: white;
+`
 
 const MediaLink = styled.a`
   color: white;

@@ -5,4 +5,4 @@ export const BASE_URI = '/';
  * FACTORY Contract
  * @type {string}
  */
-export const FACTORY = '0xFe9cCE9A48a7Dc5ce452498B00C9C35785a98605'
+export const FACTORY = '0x265242DDe499bBc7C06F7bB002633d1E493E61f5';
