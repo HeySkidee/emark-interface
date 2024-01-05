@@ -23,19 +23,15 @@ export default IndexerStats
 
 const IndexerWrapper = styled.div`
   width: 100%;
-  background: ${({behind}) => behind >= 12 ? '#F56C6C4f' : '#E6A23C4f'};
+  background: ${({behind}) => behind >= 12 ? '#F56C6C4f' : (behind <= 2 ? '#99c00b3f' : '#E6A23C4f')};
   position: fixed;
   z-index: 100;
   top: 65px;
-  display: ${({behind}) => behind >= 2 ? 'flex' : 'none'};;
+  display: flex;
   justify-content: center;
   align-items: center;
   color: rgba(255, 255, 255, 0.6);
   font-size: 10px;
   padding: 1px 0;
   transition: all 0.2s ease;
-
-  @media (max-width: 768px) {
-    display: none;
-  }
 `
